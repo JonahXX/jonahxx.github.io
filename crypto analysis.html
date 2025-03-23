@@ -16,6 +16,7 @@
     canvas {
       width: 100%;
       height: auto;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -45,34 +46,38 @@
   <script>
     // Set up the PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    
+
     // Load the PDF document (ensure the file name exactly matches your repository file)
     const loadingTask = pdfjsLib.getDocument('Crypto Pipeline.pdf');
     loadingTask.promise.then(function(pdf) {
-      // Render the first page
-      pdf.getPage(1).then(function(page) {
-        const scale = 1.5;
-        const viewport = page.getViewport({ scale: scale });
+      const viewer = document.getElementById('pdf-viewer');
+      const numPages = pdf.numPages;
 
-        // Create a canvas element for rendering
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+      // Loop through each page and render it
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        pdf.getPage(pageNum).then(function(page) {
+          const scale = 1.5;
+          const viewport = page.getViewport({ scale: scale });
 
-        // Append the canvas to the viewer container
-        const viewer = document.getElementById('pdf-viewer');
-        viewer.appendChild(canvas);
+          // Create a canvas element for the page
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
 
-        // Render the PDF page into the canvas
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-        page.render(renderContext).promise.then(function() {
-          console.log('Page rendered');
+          // Append the canvas to the viewer container
+          viewer.appendChild(canvas);
+
+          // Render the page into the canvas
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext).promise.then(function() {
+            console.log('Page ' + pageNum + ' rendered');
+          });
         });
-      });
+      }
     }).catch(function(error) {
       console.error('Error loading PDF: ' + error);
       document.getElementById('pdf-viewer').innerHTML = '<p>Sorry, your browser cannot display the PDF.</p>';
