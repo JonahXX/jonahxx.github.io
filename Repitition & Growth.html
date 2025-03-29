@@ -47,13 +47,14 @@
     // Set up the PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    // Load the PDF document (ensure the file name exactly matches your repository file)
-    const loadingTask = pdfjsLib.getDocument('Repitition & Growth.pdf');
+    // Load the PDF document with URL encoded filename to handle spaces and special characters
+    const loadingTask = pdfjsLib.getDocument('Repitition%20%26%20Growth.pdf');
     loadingTask.promise.then(function(pdf) {
       const viewer = document.getElementById('pdf-viewer');
+      const numPages = pdf.numPages;
       
       // Loop through each page of the PDF and render it
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
         pdf.getPage(pageNum).then(function(page) {
           const scale = 1.5;
           const viewport = page.getViewport({ scale: scale });
@@ -62,10 +63,11 @@
           canvas.height = viewport.height;
           canvas.width = viewport.width;
           viewer.appendChild(canvas);
-          page.render({
+          const renderContext = {
             canvasContext: context,
             viewport: viewport
-          }).promise.then(function() {
+          };
+          page.render(renderContext).promise.then(function() {
             console.log('Page ' + pageNum + ' rendered');
           });
         });
