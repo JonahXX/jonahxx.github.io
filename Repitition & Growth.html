@@ -47,13 +47,14 @@
     // Set up the PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    // Load the PDF document with URL encoded filename to handle spaces and special characters
-    const loadingTask = pdfjsLib.getDocument('Repitition%20%26%20Growth.pdf');
+    // Use URL-encoded file name for spaces and special characters
+    const pdfPath = 'Repitition%20%26%20Growth.pdf';
+    const loadingTask = pdfjsLib.getDocument(pdfPath);
     loadingTask.promise.then(function(pdf) {
       const viewer = document.getElementById('pdf-viewer');
       const numPages = pdf.numPages;
       
-      // Loop through each page of the PDF and render it
+      // Loop through each page and render it
       for (let pageNum = 1; pageNum <= numPages; pageNum++) {
         pdf.getPage(pageNum).then(function(page) {
           const scale = 1.5;
@@ -79,3 +80,4 @@
   </script>
 </body>
 </html>
+
